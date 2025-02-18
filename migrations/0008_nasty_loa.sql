@@ -1,0 +1,1 @@
+CREATE INDEX "project_user_id_index" ON "projects" USING btree ("user_id");
