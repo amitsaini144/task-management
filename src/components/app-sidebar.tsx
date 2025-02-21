@@ -31,7 +31,7 @@ export function AppSidebar() {
 
     return (
         <Sidebar >
-            <SidebarHeader className="text-lg text-black font-semibold">Task Management</SidebarHeader>
+            <SidebarHeader className="text-lg font-semibold">Task Management</SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>

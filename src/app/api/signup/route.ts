@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { users } from "@/db/schema";
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
@@ -15,16 +15,20 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const userExisted = await db.select().from(users).where(eq(users.email, email));
+        const userExisted = await db.select().from(users).where(or(eq(users.email, email), eq(users.username, username)));
         if (userExisted.length > 0) {
-            return NextResponse.json({
-                message: "User already exists",
-                status: 400
+
+            const isEmailTaken = userExisted.some((user) => user.email === email);
+
+            return NextResponse.json({ 
+                status: 400,
+                message: isEmailTaken ? "Email already exists" : "Username already exists"
             });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.insert(users).values({ username, email, password: hashedPassword });
+
         return NextResponse.json({
             message: "User created successfully",
             status: 200

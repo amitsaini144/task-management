@@ -1,42 +1,112 @@
 "use client";
 
-
+import * as z from 'zod';
 import axios from "axios";
-import { useState } from "react";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { signUpSchema } from "@/schemas/zodValidation";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner"
+import { signIn } from 'next-auth/react';
 
 export default function SignIn() {
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const form = useForm<z.infer<typeof signUpSchema>>({
+        resolver: zodResolver(signUpSchema),
+        defaultValues: {
+            username: '',
+            email: '',
+            password: '',
+        },
+    });
 
-    const handleSignUp = async () => {
-        try {
+    const signUpMutation = useMutation({
+        mutationFn: (userInfo: z.infer<typeof signUpSchema>) => axios.post("/api/signup", userInfo),
 
-            const response = await axios.post("/api/signup", {
-                username,
-                email,
-                password
+        onSuccess: async (response, variables) => {
+            toast.info(response.data.message);
+
+            await signIn('credentials', {
+                email: variables.email,
+                password: variables.password,
             });
-            console.log(response);
+        },
+        onError: (error) => {
+            console.error(error);
+        },
+    })
 
-            if (response.status === 200) {
-                alert("Sign Up Successful");
-                window.location.href = "/";
-            }
-            
-        } catch (error) {
-            console.log(error);
-            
-        }
+    const handleSignUp = (data: z.infer<typeof signUpSchema>) => {
+        signUpMutation.mutate(data);
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12 sm:px-6 lg:px-8">
-            <div className="border p-6 flex flex-col gap-4">
-                <input type="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="rounded-lg border p-2 text-black" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="rounded-lg border p-2 text-black" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-lg border p-2 text-black" />
-                <button onClick={handleSignUp} className="bg-white text-black rounded-lg px-4 py-2">Sign Up</button>
+        <div className="flex flex-col items-center justify-center flex-grow px-4 py-12 sm:px-6 lg:px-8">
+            <div className="border p-8 flex flex-col gap-4 rounded-lg bg-black">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
+                        <FormField
+                            name="username"
+                            control={form.control}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl>
+                                        <Input className="dark:bg-black/0 bg-slate-50" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            name="email"
+                            control={form.control}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} name="email" className="dark:bg-black/0 bg-slate-50" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            name="password"
+                            control={form.control}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" {...field} name="password" className="dark:bg-black/0 bg-slate-50" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className='w-full' disabled={signUpMutation.isPending}>
+                            {signUpMutation.isPending ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Please wait
+                                </>
+                            ) : (
+                                'Sign Up'
+                            )}
+                        </Button>
+                    </form>
+                </Form>
             </div>
         </div>
     )

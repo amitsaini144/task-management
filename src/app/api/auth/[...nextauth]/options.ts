@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
                 try {
                     const user = await db.select().from(users).where(eq(users.email, credentials.email));
 
-                    if (!user) {
+                    if (user.length === 0) {
                         throw new Error('No user found with this email');
                     }
                     else {
