@@ -4,7 +4,7 @@ import { buttonVariants } from './ui/button';
 
 function Footer() {
     return (
-        <footer className="text-center p-4 border-t dark:bg-black/0">
+        <footer className="text-center p-4 border-t">
             <div className="flex flex-col gap-2">
                 <p>© 2025 Task Management. All rights reserved.</p>
                 <div className="flex justify-center gap-1">

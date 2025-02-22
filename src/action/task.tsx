@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
@@ -52,11 +50,9 @@ export const taskColumns: ColumnDef<Task>[] = [
         header: "Actions",
         enableHiding: false,
         cell: () => {
-
             return (
                 <div className="h-8 w-8 p-0" onClick={(e) => {
                     e.stopPropagation();
-                    console.log("Edit");
                 }}>
                     <TaskForm type="edit" />
                 </div>

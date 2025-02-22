@@ -1,11 +1,9 @@
-"use client"
-
 import * as React from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Project } from '@/types/project'
-import AddProject from "@/components/project-form"
+import ProjectForm from "@/components/project-form"
 
 export const projectColumns: ColumnDef<Project>[] = [
     {
@@ -51,13 +49,13 @@ export const projectColumns: ColumnDef<Project>[] = [
         id: "actions",
         header: "Actions",
         enableHiding: false,
-        cell: () => {
+        cell: ({row}) => {
+            const projectDetails = row.original;
             return (
                 <div className="h-8 w-8 p-0" onClick={(e) => {
                     e.stopPropagation();
-                    console.log("Edit");
                 }}>
-                    <AddProject type="edit" />
+                    <ProjectForm type="edit" projectDetails={projectDetails} />
                 </div>
             )
         },

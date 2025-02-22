@@ -55,7 +55,7 @@ export default function SignIn() {
 
     return (
         <div className="flex flex-col items-center justify-center flex-grow px-4 py-12 sm:px-6 lg:px-8">
-            <div className="border p-8 flex flex-col gap-4 rounded-lg bg-black">                                                               
+            <div className="border p-8 flex flex-col gap-4 rounded-lg shadow-md">                                                               
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSignIn)} className="space-y-4">
                         <FormField

@@ -59,7 +59,7 @@ export function DataTable({ data, columns, type, isLoading }: { data: Project[],
         <div className="w-full">
             <div className="flex items-center py-4 justify-between">
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter projects..."
                     value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("title")?.setFilterValue(event.target.value)
@@ -122,8 +122,7 @@ export function DataTable({ data, columns, type, isLoading }: { data: Project[],
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                    {table.getFilteredRowModel().rows.length} rows
                 </div>
                 <div className="space-x-2">
                     <Button

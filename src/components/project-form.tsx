@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -24,43 +24,110 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { CalendarIcon, Edit2Icon } from "lucide-react"
+import { CalendarIcon, Edit2Icon, PlusIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Project } from "@/types/project";
 
-export default function ProjectForm({ type }: { type: "add" | "edit" }) {
+interface projectAddForm {
+    userId: string;
+    title: string;
+    description: string;
+    priorityStatus: string;
+    dueDate?: Date;
+    status: string;
+}
+
+interface projectEditForm {
+    projectId: string;
+    title: string;
+    description: string;
+    priorityStatus: string;
+    dueDate?: Date;
+    status: string;
+}
+
+export default function ProjectForm({ type, projectDetails }: { type: "add" | "edit", projectDetails?: Project }) {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [status, setStatus] = useState<string>("todo");
-    const [priorityStatus, setPriorityStatus] = useState<string>("low");
+    const [priorityStatus, setPriorityStatus] = useState<string>("high");
     const [date, setDate] = useState<Date>();
+    const [open, setOpen] = useState<boolean>(false);
 
+    const queryClient = useQueryClient();
     const { data: session } = useSession();
     const user = session?.user;
 
-    const handleSubmit = async () => {
-        try {
-            const response = await axios.post("/api/project", {
-                userId: user?.id,
-                title,
-                description,
-                priorityStatus,
-                dueDate: date,
-                status,
-            });
-
-            console.log(response);
-        } catch (error) {
-            console.error("Error submitting task:", error);
+    useEffect(() => {
+        if (type === "edit" && projectDetails) {
+            setTitle(projectDetails?.title);
+            setDescription(projectDetails?.description);
+            setPriorityStatus(projectDetails.priorityStatus);
+            setDate(projectDetails.dueDate);
+            setStatus(projectDetails.status);
         }
+    }, [type, projectDetails])
+
+    const addProjectMutation = useMutation({
+        mutationFn: (newTask: projectAddForm) => axios.post("/api/project", newTask),
+        onSuccess: () => {
+            toast.success("Project added successfully");
+            queryClient.invalidateQueries({ queryKey: ['projects', user?.id] });
+            setTitle("");
+            setDescription("");
+            setPriorityStatus("high");
+            setDate(new Date());
+            setStatus("todo");
+            setOpen(false);
+        },
+        onError: (error) => {
+            console.error("Error adding task:", error);
+        },
+    })
+
+    const editProjectMutation = useMutation({
+        mutationFn: (newTask: projectEditForm) => axios.patch("/api/project", newTask),
+        onSuccess: () => {
+            toast.success("Project edited successfully");
+            queryClient.invalidateQueries({ queryKey: ['projects', user?.id] });
+            setOpen(false);
+        },
+        onError: (error) => {
+            console.error("Error editing task:", error);
+        },
+    })
+
+    const handleAddProject = async () => {
+        addProjectMutation.mutate({
+            userId: user?.id,
+            title,
+            description,
+            priorityStatus,
+            dueDate: date,
+            status,
+        })
+    }
+
+    const handleEditProject = async () => {
+        editProjectMutation.mutate({
+            projectId: projectDetails?.id ?? "",
+            title,
+            description,
+            priorityStatus,
+            dueDate: date,
+            status,
+        })
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {type === "add" ? (
-                    <Button variant="outline">Add Project</Button>
+                    <Button variant="outline">Project<PlusIcon /></Button>
                 ) : (
                     <Button variant="ghost" className="h-8 w-8 p-0">
                         <Edit2Icon />
@@ -79,8 +146,10 @@ export default function ProjectForm({ type }: { type: "add" | "edit" }) {
                         </Label>
                         <Input
                             id="title"
+                            value={title}
                             className="col-span-3"
-                            onChange={(e) => setTitle(e.target.value)} />
+                            onChange={(e) => setTitle(e.target.value)}
+                            />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="description" className="text-left">
@@ -88,8 +157,10 @@ export default function ProjectForm({ type }: { type: "add" | "edit" }) {
                         </Label>
                         <Textarea
                             id="description"
-                            className="col-span-3 max-h-60"
-                            onChange={(e) => setDescription(e.target.value)} />
+                            value={description}
+                            className="col-span-3 max-h-60 min-h-28"
+                            onChange={(e) => setDescription(e.target.value)}
+                            />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="status" className="text-left">
@@ -154,7 +225,15 @@ export default function ProjectForm({ type }: { type: "add" | "edit" }) {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={handleSubmit}>{type === "add" ? "Add" : "Save"}</Button>
+                    <Button
+                        type="submit"
+                        onClick={type === "add" ? handleAddProject : handleEditProject}
+                        disabled={addProjectMutation.isPending || editProjectMutation.isPending || !title || !description || !date}>
+                        {type === "add" ?
+                            (addProjectMutation.isPending ? "Adding..." : "Add")
+                            :
+                            (editProjectMutation.isPending ? "Saving..." : "Save")}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

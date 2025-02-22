@@ -6,15 +6,18 @@ export default async function middleware(req: NextRequest) {
     const token = await getToken({ req });
     const url = req.nextUrl;
 
-    if (token &&
-        (url.pathname.startsWith('/signin') ||
-            url.pathname.startsWith('/signup') ||
-            url.pathname === '/')
+    const protectedRoutes = ['/dashboard', '/tasks'];
+
+    const isProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route));
+
+    if (token && (url.pathname.startsWith('/signin') ||
+        url.pathname.startsWith('/signup') ||
+        url.pathname === '/')
     ) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
-    if (!token && url.pathname.startsWith('/dashboard')) {
+    if (!token && isProtectedRoute) {
         return NextResponse.redirect(new URL('/', req.url));
     }
     return NextResponse.next();

@@ -2,8 +2,9 @@
 
 export interface Task {
     id: string
-    dueDate: string
-    priority: "low" | "medium" | "high"
+    dueDate: Date
+    priorityStatus: "low" | "medium" | "high"
     status: "pending" | "processing" | "success" | "failed"
     title: string
+    description: string
 }

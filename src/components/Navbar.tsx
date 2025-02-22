@@ -7,24 +7,21 @@ import { ThemeToggler } from './ThemeToggler';
 function Navbar() {
 
   return (
-    <nav className="sticky top-0 z-50 border-b w-full backdrop-blur px-3 py-2 bg-background/50">
+    <nav className="sticky top-0 z-50 w-full backdrop-blur px-3 py-2">
       <div className="container mx-auto flex flex-row justify-between items-center px-0">
         <Link href="/" className="text-xl font-bold">
-          Task Management
+          Project Management
         </Link>
         <div className='flex gap-1'>
           <ThemeToggler />
           <>
             <Link href="/signup">
-              <Button
-                className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800" variant={'ghost'}>SignUp</Button>
+              <Button variant={'ghost'}>SignUp</Button>
             </Link>
             <Link href="/signin">
-              <Button
-                className="bg-white dark:bg-slate-900 text-black dark:text-white border-neutral-200 dark:border-slate-800" variant={'ghost'}>LogIn</Button>
+              <Button variant={'ghost'}>LogIn</Button>
             </Link>
           </>
-
         </div>
       </div>
     </nav>

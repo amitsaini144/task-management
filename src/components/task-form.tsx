@@ -24,11 +24,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { CalendarIcon, Edit2Icon } from "lucide-react"
+import { CalendarIcon, Edit2Icon, PlusIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import axios from "axios";
 import { usePathname } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface taskForm {
     projectId: string;
@@ -45,7 +46,6 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
     const [status, setStatus] = useState<string>("todo");
     const [priorityStatus, setPriorityStatus] = useState<string>("low");
     const [date, setDate] = useState<Date>();
-
     const [open, setOpen] = useState<boolean>(false);
 
     const queryClient = useQueryClient();
@@ -56,7 +56,7 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
     const addTaskMutation = useMutation({
         mutationFn: (newTask: taskForm) => axios.post("/api/task", newTask),
         onSuccess: () => {
-            console.log("Task added successfully");
+            toast.success("Task added successfully");
             queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
             setOpen(false);
         },
@@ -80,7 +80,7 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {type === "add" ? (
-                    <Button variant="outline">Add Task</Button>
+                    <Button variant="outline">Task<PlusIcon /></Button>
                 ) : (
                     <Button variant="ghost" className="h-8 w-8 p-0">
                         <Edit2Icon />
@@ -174,7 +174,12 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={handleSubmit}>{type === "add" ? "Add" : "Save"}</Button>
+                    <Button
+                        type="submit"
+                        onClick={handleSubmit}
+                        disabled={addTaskMutation.isPending || !title || !description || !date}>
+                        {type === "add" ? (addTaskMutation.isPending ? "Adding..." : "Add") : "Save"}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

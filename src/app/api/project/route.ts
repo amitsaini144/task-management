@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const project = (await db.select().from(projects).where(eq(projects.userId, Number(userId)))).reverse();
+        const project = ((await db.select().from(projects).where(eq(projects.userId, Number(userId))).orderBy(projects.createdAt)).reverse());
         return NextResponse.json(project);
     } catch (error) {
         return NextResponse.json({ message: "error", error: error }, { status: 500 });
@@ -51,11 +51,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-    const { id, ...updateFields } = await req.json();
+    const { projectId, ...updateFields } = await req.json();
 
-    if (!id) {
+    if (!projectId) {
         return NextResponse.json(
-            { message: "Please provide id" },
+            { message: "Please provide productId" },
             { status: 400 }
         );
     }
@@ -68,7 +68,11 @@ export async function PATCH(req: NextRequest) {
     }
 
     try {
-        await db.update(projects).set(updateFields).where(eq(projects.id, Number(id)));
+        const totalUpdateFields = {
+            ...updateFields,
+            updatedAt: new Date().toISOString(),
+        }
+        await db.update(projects).set(totalUpdateFields).where(eq(projects.id, Number(projectId)));
         return NextResponse.json({
             message: "Update successful",
             success: 200,

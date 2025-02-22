@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ChevronUp, LayoutList, User2 } from "lucide-react";
-import { useSession, signOut } from "next-auth/react"; 
+import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -27,26 +28,32 @@ const items = [
 
 export function AppSidebar() {
     const { data: session } = useSession();
+    const pathname = usePathname();
     const user = session?.user;
 
     return (
         <Sidebar >
-            <SidebarHeader className="text-lg font-semibold">Task Management</SidebarHeader>
+            <SidebarHeader className="text-lg font-semibold">Project Management</SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
+                            {items.map((item) => {
+                               const isActive = pathname === item.url;
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild
+                                        className={isActive ? "bg-black text-white dark:bg-white dark:text-black" : ""}
+                                        >
+                                            <Link href={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
 
-                                </SidebarMenuItem>
-                            ))}
+                                    </SidebarMenuItem>
+                                )
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
