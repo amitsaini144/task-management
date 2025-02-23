@@ -73,7 +73,7 @@ export function TaskTable({ data, columns, type, isLoading }: TaskTableProps) {
                 />
                 {type === "project" ? <ProjectForm type="add" />: <TaskForm type="add" />}
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-md border bg-sidebar">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

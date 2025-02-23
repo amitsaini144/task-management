@@ -34,7 +34,7 @@ export default function Tasks() {
                 <h1 className="text-2xl font-bold">Tasks</h1>
             </div>
             <div className="flex flex-col p-4">
-                <div className="flex flex-col p-4 gap-4 border rounded-lg">
+                <div className="flex flex-col p-4 gap-4 border rounded-lg bg-sidebar">
                     <div className="flex justify-between">
                         {isLoading ? <Skeleton className="w-[150px] h-[16px] rounded-full" /> : <p>{data?.title}</p>}
                         {isLoading ? <Skeleton className="w-[100px] h-[14px] rounded-full" /> : <p className="text-sm">{data?.dueDate.split(" ")[0]}</p>}

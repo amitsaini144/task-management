@@ -6,6 +6,12 @@ import { Project } from '@/types/project'
 import ProjectForm from "@/components/project-form"
 import DeleteDialog from "@/components/delete-dialog"
 
+const statusColors: Record<string, string> = {
+    "completed": "bg-success",
+    "in progress": "dark:bg-ongoing bg-ongoing2",
+    "pending": "bg-destructive"
+};
+
 export const projectColumns: ColumnDef<Project>[] = [
     {
         accessorKey: "title",
@@ -42,15 +48,19 @@ export const projectColumns: ColumnDef<Project>[] = [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("status")}</div>
-        ),
+        cell: ({ row }) => {
+            const status: string = row.getValue("status") || "";
+            const colorClass = statusColors[status] || "bg-gray-500";
+            return (
+                <button className={`py-1 px-2 text-white rounded-md capitalize ${colorClass}`}>{status}</button>
+            )
+        },
     },
     {
         id: "actions",
         header: "Actions",
         enableHiding: false,
-        cell: ({row}) => {
+        cell: ({ row }) => {
             const projectDetails = row.original;
             return (
                 <div className="h-8 w-8 p-0 flex gap-4" onClick={(e) => {

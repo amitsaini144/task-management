@@ -52,7 +52,7 @@ interface taskEditForm {
 export default function TaskForm({ type, taskDetails }: { type: "add" | "edit", taskDetails?: Task }) {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [status, setStatus] = useState<string>("todo");
+    const [status, setStatus] = useState<string>("pending");
     const [priorityStatus, setPriorityStatus] = useState<string>("low");
     const [date, setDate] = useState<Date>();
     const [open, setOpen] = useState<boolean>(false);
@@ -80,7 +80,7 @@ export default function TaskForm({ type, taskDetails }: { type: "add" | "edit", 
             setDescription("");
             setPriorityStatus("high");
             setDate(new Date());
-            setStatus("todo");
+            setStatus("pending");
             setOpen(false);
         },
         onError: (error) => {
@@ -169,7 +169,7 @@ export default function TaskForm({ type, taskDetails }: { type: "add" | "edit", 
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem value="todo">To Do</SelectItem>
+                                    <SelectItem value="pending">Pending</SelectItem>
                                     <SelectItem value="in progress">In Progress</SelectItem>
                                     <SelectItem value="completed">Completed</SelectItem>
                                 </SelectGroup>

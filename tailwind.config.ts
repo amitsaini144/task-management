@@ -1,3 +1,4 @@
+import { on } from "events";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -6,6 +7,7 @@ export default {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+	"./src/action/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
   	extend: {
@@ -40,6 +42,9 @@ export default {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			success: 'hsl(120, 50%, 40%)',
+			ongoing: 'hsl(50, 100%, 45%)',
+			ongoing2: 'hsl(50, 100%, 50%)',
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

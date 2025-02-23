@@ -16,7 +16,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const priorityStatusEnum = pgEnum('priority_status', ['low', 'medium', 'high']);
-export const statusEnum = pgEnum('status', ['todo', 'in progress', 'completed']);
+export const statusEnum = pgEnum('status', ['pending', 'in progress', 'completed']);
 
 export const projects = pgTable("projects", {
     id: serial().primaryKey(),

@@ -6,6 +6,12 @@ import { Task } from '@/types/task'
 import TaskForm from "@/components/task-form"
 import DeleteDialog from "@/components/delete-dialog"
 
+const statusColors: Record<string, string> = {
+    "completed": "bg-success",
+    "in progress": "dark:bg-ongoing bg-ongoing2",
+    "pending": "bg-destructive"
+};
+
 export const taskColumns: ColumnDef<Task>[] = [
     {
         accessorKey: "title",
@@ -42,9 +48,13 @@ export const taskColumns: ColumnDef<Task>[] = [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("status")}</div>
-        ),
+        cell: ({ row }) => {
+            const status: string = row.getValue("status") || "";
+            const colorClass = statusColors[status] || "bg-gray-500";
+            return (
+                <button className={`py-1 px-2 text-white rounded-md capitalize ${colorClass}`}>{status}</button>
+            )
+        },
     },
     {
         id: "actions",
