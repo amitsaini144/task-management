@@ -4,7 +4,7 @@ export interface Project {
     id: string
     dueDate: Date
     priorityStatus: "low" | "medium" | "high"
-    status: "pending" | "processing" | "success" | "failed"
+    status: "todo" | "in progress" | "completed"
     title: string
     description: string
 }

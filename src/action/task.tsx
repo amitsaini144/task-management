@@ -4,6 +4,7 @@ import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Task } from '@/types/task'
 import TaskForm from "@/components/task-form"
+import DeleteDialog from "@/components/delete-dialog"
 
 export const taskColumns: ColumnDef<Task>[] = [
     {
@@ -49,12 +50,14 @@ export const taskColumns: ColumnDef<Task>[] = [
         id: "actions",
         header: "Actions",
         enableHiding: false,
-        cell: () => {
+        cell: ({ row }) => {
+            const taskDetails = row.original;
             return (
-                <div className="h-8 w-8 p-0" onClick={(e) => {
+                <div className="h-8 w-8 p-0 flex gap-4" onClick={(e) => {
                     e.stopPropagation();
                 }}>
-                    <TaskForm type="edit" />
+                    <TaskForm type="edit" taskDetails={taskDetails} />
+                    <DeleteDialog type="task" id={taskDetails.id} />
                 </div>
             )
         },

@@ -49,39 +49,3 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: "error", error: error }, { status: 500 });
     }
 }
-
-export async function PATCH(req: NextRequest) {
-    const { projectId, ...updateFields } = await req.json();
-
-    if (!projectId) {
-        return NextResponse.json(
-            { message: "Please provide productId" },
-            { status: 400 }
-        );
-    }
-
-    if (Object.keys(updateFields).length === 0) {
-        return NextResponse.json(
-            { message: "No fields provided for update" },
-            { status: 400 }
-        );
-    }
-
-    try {
-        const totalUpdateFields = {
-            ...updateFields,
-            updatedAt: new Date().toISOString(),
-        }
-        await db.update(projects).set(totalUpdateFields).where(eq(projects.id, Number(projectId)));
-        return NextResponse.json({
-            message: "Update successful",
-            success: 200,
-        })
-
-    } catch (error) {
-        return NextResponse.json(
-            { message: "Error in updating", error: error },
-            { status: 500 }
-        );
-    }
-}

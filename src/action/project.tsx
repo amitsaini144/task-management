@@ -4,6 +4,7 @@ import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Project } from '@/types/project'
 import ProjectForm from "@/components/project-form"
+import DeleteDialog from "@/components/delete-dialog"
 
 export const projectColumns: ColumnDef<Project>[] = [
     {
@@ -52,10 +53,11 @@ export const projectColumns: ColumnDef<Project>[] = [
         cell: ({row}) => {
             const projectDetails = row.original;
             return (
-                <div className="h-8 w-8 p-0" onClick={(e) => {
+                <div className="h-8 w-8 p-0 flex gap-4" onClick={(e) => {
                     e.stopPropagation();
                 }}>
                     <ProjectForm type="edit" projectDetails={projectDetails} />
+                    <DeleteDialog type="project" id={projectDetails.id} />
                 </div>
             )
         },

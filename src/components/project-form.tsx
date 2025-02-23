@@ -42,7 +42,6 @@ interface projectAddForm {
 }
 
 interface projectEditForm {
-    projectId: string;
     title: string;
     description: string;
     priorityStatus: string;
@@ -90,7 +89,7 @@ export default function ProjectForm({ type, projectDetails }: { type: "add" | "e
     })
 
     const editProjectMutation = useMutation({
-        mutationFn: (newTask: projectEditForm) => axios.patch("/api/project", newTask),
+        mutationFn: (newTask: projectEditForm) => axios.patch(`/api/project/${projectDetails?.id}`, newTask),
         onSuccess: () => {
             toast.success("Project edited successfully");
             queryClient.invalidateQueries({ queryKey: ['projects', user?.id] });
@@ -114,7 +113,6 @@ export default function ProjectForm({ type, projectDetails }: { type: "add" | "e
 
     const handleEditProject = async () => {
         editProjectMutation.mutate({
-            projectId: projectDetails?.id ?? "",
             title,
             description,
             priorityStatus,

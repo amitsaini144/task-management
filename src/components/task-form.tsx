@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -30,8 +30,9 @@ import axios from "axios";
 import { usePathname } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Task } from "@/types/task";
 
-interface taskForm {
+interface taskAddForm {
     projectId: string;
     title: string;
     description: string;
@@ -40,7 +41,15 @@ interface taskForm {
     status: string;
 }
 
-export default function TaskForm({ type }: { type: "add" | "edit" }) {
+interface taskEditForm {
+    title: string;
+    description: string;
+    priorityStatus: string;
+    dueDate?: Date;
+    status: string;
+}
+
+export default function TaskForm({ type, taskDetails }: { type: "add" | "edit", taskDetails?: Task }) {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [status, setStatus] = useState<string>("todo");
@@ -49,15 +58,29 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
     const [open, setOpen] = useState<boolean>(false);
 
     const queryClient = useQueryClient();
-
     const pathname = usePathname();
     const projectId = pathname.split("/")[2];
 
+    useEffect(() => {
+        if (type === "edit" && taskDetails) {
+            setTitle(taskDetails?.title);
+            setDescription(taskDetails?.description);
+            setPriorityStatus(taskDetails.priorityStatus);
+            setDate(taskDetails.dueDate);
+            setStatus(taskDetails.status);
+        }
+    }, [type, taskDetails])
+
     const addTaskMutation = useMutation({
-        mutationFn: (newTask: taskForm) => axios.post("/api/task", newTask),
+        mutationFn: (newTask: taskAddForm) => axios.post("/api/task", newTask),
         onSuccess: () => {
             toast.success("Task added successfully");
             queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+            setTitle("");
+            setDescription("");
+            setPriorityStatus("high");
+            setDate(new Date());
+            setStatus("todo");
             setOpen(false);
         },
         onError: (error) => {
@@ -65,9 +88,32 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
         },
     })
 
-    const handleSubmit = async () => {
+    const editTaskMutation = useMutation({
+        mutationFn: (newTask: taskEditForm) => axios.patch(`/api/task/${taskDetails?.id}`, newTask),
+        onSuccess: () => {
+            toast.success("Task edited successfully");
+            queryClient.invalidateQueries({ queryKey: ['tasks', projectId] });
+            setOpen(false);
+        },
+        onError: (error) => {
+            console.error("Error editing task:", error);
+        },
+    })
+
+
+    const handleAddTask = async () => {
         addTaskMutation.mutate({
             projectId,
+            title,
+            description,
+            priorityStatus,
+            dueDate: date,
+            status,
+        })
+    }
+
+    const handleEditTask = async () => {
+        editTaskMutation.mutate({
             title,
             description,
             priorityStatus,
@@ -99,6 +145,7 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
                         </Label>
                         <Input
                             id="title"
+                            value={title}
                             className="col-span-3"
                             onChange={(e) => setTitle(e.target.value)} />
                     </div>
@@ -108,6 +155,7 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
                         </Label>
                         <Textarea
                             id="description"
+                            value={description}
                             className="col-span-3 max-h-60"
                             onChange={(e) => setDescription(e.target.value)} />
                     </div>
@@ -176,9 +224,13 @@ export default function TaskForm({ type }: { type: "add" | "edit" }) {
                 <DialogFooter>
                     <Button
                         type="submit"
-                        onClick={handleSubmit}
+                        onClick={type === "add" ? handleAddTask : handleEditTask}
                         disabled={addTaskMutation.isPending || !title || !description || !date}>
-                        {type === "add" ? (addTaskMutation.isPending ? "Adding..." : "Add") : "Save"}
+                        {type === "add" ?
+                            (addTaskMutation.isPending ? "Adding..." : "Add")
+                            :
+                            (editTaskMutation.isPending ? "Saving..." : "Save")
+                        }
                     </Button>
                 </DialogFooter>
             </DialogContent>
