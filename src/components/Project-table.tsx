@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Project } from '@/types/project'
 import TaskForm from "./task-form"
+import { motion } from "framer-motion"
 
 export function DataTable({ data, columns, type, isLoading }: { data: Project[], columns: ColumnDef<Project>[], type: "project" | "task", isLoading: boolean }) {
     const [sorting, setSorting] = useState<SortingState>([])
@@ -66,9 +67,16 @@ export function DataTable({ data, columns, type, isLoading }: { data: Project[],
                     }
                     className="max-w-sm"
                 />
-                {type === "project" ? <ProjectForm type="add" />: <TaskForm type="add" />}
+                {type === "project" ? <ProjectForm type="add" /> : <TaskForm type="add" />}
             </div>
-            <div className="rounded-md border bg-sidebar">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                    duration: 0.3,
+                    ease: "easeInOut"
+                }}
+                className="rounded-md border bg-sidebar">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -111,7 +119,7 @@ export function DataTable({ data, columns, type, isLoading }: { data: Project[],
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-40 text-center"
                                 >
                                     {isLoading ? "Loading..." : "No results."}
                                 </TableCell>
@@ -119,7 +127,7 @@ export function DataTable({ data, columns, type, isLoading }: { data: Project[],
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </motion.div>
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="flex-1 text-sm text-muted-foreground">
                     {table.getFilteredRowModel().rows.length} rows

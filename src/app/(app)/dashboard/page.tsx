@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { projectColumns } from "@/action/project";
 import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
 
 export default function Dashboard() {
     const { data: session } = useSession();
@@ -27,13 +28,20 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen ">
+        <motion.div
+            initial={{ opacity: 0, x: "-40vw", }}
+            animate={{ opacity: 1, x: 0, }}
+            transition={{
+                duration: 0.5,
+                ease: "easeInOut"
+            }}
+            className="flex flex-col min-h-screen">
             <div className="flex px-4 pt-4">
                 <h1 className="text-2xl font-bold">Projects</h1>
             </div>
             <div className="flex flex-col gap-4 p-4">
                 <DataTable data={data} columns={projectColumns} type="project" isLoading={isLoading} />
             </div>
-        </div>
+        </motion.div>
     )
 }
