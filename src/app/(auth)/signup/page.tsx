@@ -52,7 +52,8 @@ export default function SignIn() {
 
     return (
         <div className="flex flex-col items-center justify-center flex-grow px-4 py-12 sm:px-6 lg:px-8">
-            <div className="border p-8 flex flex-col gap-4 rounded-lg shadow-md">
+            <div className="border px-8 py-6 flex flex-col gap-4 rounded-lg shadow-md w-full max-w-sm">
+                <h2 className='text-center text-3xl font-bold'>Sign Up</h2>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
                         <FormField
